@@ -1,5 +1,5 @@
 //===============================================================================
-// app_main.cpp — Point d’entrée du moteur Tetris (AKA Edition)
+// app_main.cpp — Point d’entrée du moteur TAKATRIs pour la Gamebuino AKA
 //-------------------------------------------------------------------------------
 //  Rôle :
 //    - Initialiser l’ensemble du hardware (LCD, audio, input, SD, expander).
