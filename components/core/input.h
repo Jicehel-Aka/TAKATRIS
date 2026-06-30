@@ -40,6 +40,7 @@ void input_poll();       // Met à jour l’état des boutons (à appeler chaque
 
 bool button_pressed(int btn);   // Front montant
 bool button_down(int btn);      // Bouton maintenu
+bool button_held(int btn);      // Alias propre pour bouton maintenu
 bool input_ready();             // Anti-repeat simple
-
 bool isLongPress(int btn);      // Pression longue (~1s)
+

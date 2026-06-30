@@ -20,7 +20,12 @@ set(COMPONENT_ADD_INCLUDEDIRS
 idf_component_register(
     SRCS ${COMPONENT_SRCS}
     INCLUDE_DIRS ${COMPONENT_ADD_INCLUDEDIRS}
-    REQUIRES core gamebuino nvs_flash
+    REQUIRES 
+        core 
+        gamebuino 
+        nvs_flash
+        app_update
+        esp_partition
 )
 
 # Forcer le composant à être compilé en C++

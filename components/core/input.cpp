@@ -61,6 +61,10 @@ bool button_pressed(int btn)
     return false;
 }
 
+bool button_held(int btn)
+{
+    return button_down(btn);
+}
 // -----------------------------------------------------------------------------
 // Bouton maintenu
 // -----------------------------------------------------------------------------

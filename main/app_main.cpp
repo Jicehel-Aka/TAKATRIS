@@ -44,7 +44,60 @@
 
 gb_core g_core;
 
+//===============================================================================
+//  Combo RUN + MENU → Retour au Loader OTA (TAKATRIS / Gamebuino AKA)
+//-------------------------------------------------------------------------------
+//  Rôle :
+//    - Détecter RUN + MENU maintenus 500 ms.
+//    - Basculer sur la partition OTA_1 (loader AKA).
+//    - Redémarrer proprement l’ESP32‑S3.
+//
+//  Dépendances :
+//    - button_held()  → input.cpp
+//    - g_core.get_millis() → moteur AKA
+//===============================================================================
 
+#include <esp_ota_ops.h>
+#include <esp_partition.h>
+
+static uint32_t combo_start = 0;
+
+void checkReturnToLoader()
+{
+    // Lecture des boutons via le moteur AKA
+    bool home_held = button_held(BTN_RUN);   // RUN = bouton HOME
+    bool menu_held = button_held(BTN_MENU);  // MENU
+
+    if (home_held && menu_held)
+    {
+        // Début du combo
+        if (combo_start == 0)
+            combo_start = g_core.get_millis();
+
+        // Maintenu 500 ms → retour loader
+        else if (g_core.get_millis() - combo_start >= 500)
+        {
+            combo_start = 0;
+
+            const esp_partition_t* loader = esp_partition_find_first(
+                ESP_PARTITION_TYPE_APP,
+                ESP_PARTITION_SUBTYPE_APP_OTA_1,
+                nullptr
+            );
+
+            if (loader)
+            {
+                esp_ota_set_boot_partition(loader);
+                esp_restart();
+            }
+        }
+    }
+    else
+    {
+        // Combo relâché → reset
+        combo_start = 0;
+    }
+}
 // ============================================================================
 //  Initialisation hardware AKA
 // ============================================================================
@@ -104,6 +157,16 @@ extern "C" void app_main(void)
 
     printf("[Tetris] Tâches lancées. Entrée en idle loop.\n");
 
-    while (true)
-        vTaskDelay(pdMS_TO_TICKS(1000));
+    // -------------------------------------------------------------------------
+    //  Boucle idle
+    //  - Polling input (obligatoire pour BTN_RUN / BTN_MENU)
+    //  - Vérification du combo RUN+MENU
+    //  - Petit délai pour éviter de saturer le CPU
+    // -------------------------------------------------------------------------
+	while (true)
+	{
+		checkReturnToLoader();   // Vérifie RUN + MENU
+		vTaskDelay(pdMS_TO_TICKS(10));
+	}
+
 }
